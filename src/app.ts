@@ -3,7 +3,7 @@ import morgan from 'morgan';
 import cors from 'cors';
 import dotenv from 'dotenv';
 import connectDB from './config/db';
-import matriculaRoutes from './materia/matricula.routes';
+import matriculaRoutes from './materia/materia.routes';
 
 // Initialize express app
 const app = express();

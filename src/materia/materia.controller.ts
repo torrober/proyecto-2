@@ -5,7 +5,7 @@ import {
   obtenerMaterias, 
   modificarMateria, 
   eliminarMateria 
-} from './matricula.actions';
+} from './materia.actions';
 import { verificarAdmin, verificarProfesorOAdmin, RequestWithUser } from '../middleware/auth.middleware';
 
 const handleControllerError = (res: Response, message: string, error: unknown) => {

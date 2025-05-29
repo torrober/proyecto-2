@@ -6,7 +6,7 @@ import {
     updateMateriaController,
     deleteMateriaController,
     healthCheck
-} from './matricula.controller';
+} from './materia.controller';
 import { RequestWithUser } from '../middleware/auth.middleware';
 
 const router = Router();
