@@ -7,42 +7,63 @@ import {
     deleteMateriaController,
     healthCheck
 } from './materia.controller';
-import { RequestWithUser } from '../middleware/auth.middleware';
+import { verificarAdmin, verificarProfesorOAdmin, RequestWithUser } from '../middleware/auth.middleware';
+import { ControllerResponse } from '../types/controller.types';
 
 const router = Router();
 
-const wrapMiddleware = (handler: any) => {
-    return async (req: Request, res: Response, next: NextFunction) => {
-        try {
-            await handler(req as RequestWithUser, res, next);
-        } catch (error) {
-            next(error);
-        }
-    };
+const wrapHandler = (
+  handler: (req: RequestWithUser) => Promise<ControllerResponse<any>>
+): ((req: Request, res: Response, next: NextFunction) => Promise<void>) => {
+  return async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+    try {
+      const result = await handler(req as RequestWithUser);
+      res.status(result.statusCode).json(
+        result.success ? 
+          result.data : 
+          { message: result.error }
+      );
+    } catch (error) {
+      next(error);
+    }
+  };
+};
+
+const wrapMiddleware = (middleware: any) => {
+  return async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+    try {
+      await middleware(req as RequestWithUser, res, next);
+    } catch (error) {
+      next(error);
+    }
+  };
 };
 
 // Health check endpoint
-router.get('/health', wrapMiddleware(healthCheck));
+router.get('/health', wrapHandler(() => healthCheck()));
 
-// Ruta para crear una nueva materia (Solo admin)
+// Crear materia (Solo admin)
 router.post('/', 
-    wrapMiddleware(createMateriaController[0]),
-    wrapMiddleware(createMateriaController[1]));
+  wrapMiddleware(verificarAdmin),
+  wrapHandler(createMateriaController)
+);
 
-// Ruta para obtener todas las materias
-router.get('/', wrapMiddleware(getAllMateriasController));
+// Obtener todas las materias
+router.get('/', wrapHandler(getAllMateriasController));
 
-// Ruta para obtener una materia específica
-router.get('/:id', wrapMiddleware(getMateriaController));
+// Obtener una materia específica
+router.get('/:id', wrapHandler(getMateriaController));
 
-// Ruta para actualizar una materia (Admin o profesor asignado)
+// Actualizar materia (Admin o profesor asignado)
 router.put('/:id',
-    wrapMiddleware(updateMateriaController[0]),
-    wrapMiddleware(updateMateriaController[1]));
+  wrapMiddleware(verificarProfesorOAdmin),
+  wrapHandler(updateMateriaController)
+);
 
-// Ruta para eliminar una materia (Solo admin)
+// Eliminar materia (Solo admin)
 router.delete('/:id',
-    wrapMiddleware(deleteMateriaController[0]),
-    wrapMiddleware(deleteMateriaController[1]));
+  wrapMiddleware(verificarAdmin),
+  wrapHandler(deleteMateriaController)
+);
 
 export default router;

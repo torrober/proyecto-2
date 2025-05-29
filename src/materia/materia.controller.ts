@@ -1,4 +1,3 @@
-import { Response } from 'express';
 import { 
   crearMateria, 
   obtenerMateria, 
@@ -6,55 +5,122 @@ import {
   modificarMateria, 
   eliminarMateria 
 } from './materia.actions';
-import { verificarAdmin, verificarProfesorOAdmin, RequestWithUser } from '../middleware/auth.middleware';
+import { RequestWithUser } from '../middleware/auth.middleware';
+import { ControllerResponse } from '../types/controller.types';
+import { IMateria } from './materia.model';
 
-const handleControllerError = (res: Response, message: string, error: unknown) => {
-  return res.status(500).json({
-    message,
-    error: error instanceof Error ? error.message : 'Error desconocido'
-  });
-};
-
-export const createMateriaController = [verificarAdmin, async (req: RequestWithUser, res: Response): Promise<void> => {
+export const createMateriaController = async (req: RequestWithUser): Promise<ControllerResponse<IMateria>> => {
   try {
-    await crearMateria(req, res);
+    const { user, ...materiaData } = req.body;
+    const materiaCreada = await crearMateria(materiaData);
+    return {
+      success: true,
+      data: materiaCreada,
+      statusCode: 201
+    };
   } catch (error) {
-    handleControllerError(res, 'Error en el controlador al crear materia', error);
-  }
-}];
-
-export const getMateriaController = async (req: RequestWithUser, res: Response): Promise<void> => {
-  try {
-    await obtenerMateria(req, res);
-  } catch (error) {
-    handleControllerError(res, 'Error en el controlador al obtener materia', error);
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : 'Error desconocido',
+      statusCode: 500
+    };
   }
 };
 
-export const getAllMateriasController = async (req: RequestWithUser, res: Response): Promise<void> => {
+export const getMateriaController = async (req: RequestWithUser): Promise<ControllerResponse<IMateria>> => {
   try {
-    await obtenerMaterias(req, res);
+    const materia = await obtenerMateria(req.params.id);
+    if (!materia) {
+      return {
+        success: false,
+        error: 'Materia no encontrada',
+        statusCode: 404
+      };
+    }
+    return {
+      success: true,
+      data: materia,
+      statusCode: 200
+    };
   } catch (error) {
-    handleControllerError(res, 'Error en el controlador al obtener materias', error);
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : 'Error desconocido',
+      statusCode: 500
+    };
   }
 };
 
-export const updateMateriaController = [verificarProfesorOAdmin, async (req: RequestWithUser, res: Response): Promise<void> => {
+export const getAllMateriasController = async (): Promise<ControllerResponse<IMateria[]>> => {
   try {
-    await modificarMateria(req, res);
+    const materias = await obtenerMaterias();
+    return {
+      success: true,
+      data: materias,
+      statusCode: 200
+    };
   } catch (error) {
-    handleControllerError(res, 'Error en el controlador al modificar materia', error);
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : 'Error desconocido',
+      statusCode: 500
+    };
   }
-}];
-
-export const healthCheck = async (_req: RequestWithUser, res: Response): Promise<void> => {
-    res.status(200).json({ status: 'ok' });
 };
 
-export const deleteMateriaController = [verificarAdmin, async (req: RequestWithUser, res: Response): Promise<void> => {
+export const updateMateriaController = async (req: RequestWithUser): Promise<ControllerResponse<IMateria>> => {
   try {
-    await eliminarMateria(req, res);
+    const { user, ...updateData } = req.body;
+    const materiaActualizada = await modificarMateria(req.params.id, updateData);
+    if (!materiaActualizada) {
+      return {
+        success: false,
+        error: 'Materia no encontrada',
+        statusCode: 404
+      };
+    }
+    return {
+      success: true,
+      data: materiaActualizada,
+      statusCode: 200
+    };
   } catch (error) {
-    handleControllerError(res, 'Error en el controlador al eliminar materia', error);
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : 'Error desconocido',
+      statusCode: 500
+    };
   }
-}];
+};
+
+export const healthCheck = async (): Promise<ControllerResponse<{ status: string }>> => {
+  return {
+    success: true,
+    data: { status: 'ok' },
+    statusCode: 200
+  };
+};
+
+export const deleteMateriaController = async (req: RequestWithUser): Promise<ControllerResponse<IMateria>> => {
+  try {
+    const materiaEliminada = await eliminarMateria(req.params.id);
+    if (!materiaEliminada) {
+      return {
+        success: false,
+        error: 'Materia no encontrada o ya está eliminada',
+        statusCode: 404
+      };
+    }
+    return {
+      success: true,
+      data: materiaEliminada,
+      statusCode: 200
+    };
+  } catch (error) {
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : 'Error desconocido',
+      statusCode: 500
+    };
+  }
+};
