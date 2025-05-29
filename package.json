@@ -5,7 +5,13 @@
   "scripts": {
     "dev": "ts-node-dev --respawn --transpile-only src/app.ts",
     "build": "tsc",
-    "start": "node dist/app.js"
+    "start": "node dist/app.js",
+    "test": "jest",
+    "test:watch": "jest --watch",
+    "test:coverage": "jest --coverage",
+    "test:unit": "jest src/tests/materia.controller.test.ts",
+    "test:routes": "jest src/tests/materia.routes.test.ts",
+    "test:e2e": "jest src/tests/materia.e2e.test.ts"
   },
   "keywords": [],
   "author": "",
@@ -28,6 +34,7 @@
     "cors": "^2.8.5",
     "dotenv": "^16.5.0",
     "express": "^5.1.0",
+    "mongodb-memory-server": "^10.1.4",
     "mongoose": "^8.15.1",
     "morgan": "^1.10.0"
   }
