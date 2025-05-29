@@ -1,6 +1,6 @@
 import { Response, NextFunction } from 'express';
 import { Request } from 'express';
-import { Materia } from '../matricula/matricula.model';
+import { Materia } from '../materia/materia.model';
 
 /**
  * Represents the possible roles a user can have in the system.

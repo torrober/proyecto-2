@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import { Materia } from './matricula.model';
+import { Materia } from './materia.model';
 
 // Crear Materia
 export const crearMateria = async (req: Request, res: Response) => {
