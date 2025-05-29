@@ -5,48 +5,41 @@ import {
   modificarMateria, 
   eliminarMateria 
 } from './materia.actions';
-import { RequestWithUser } from '../middleware/auth.middleware';
 import { ControllerResponse } from '../types/controller.types';
 import { IMateria } from './materia.model';
 
-export const createMateriaController = async (req: RequestWithUser): Promise<ControllerResponse<IMateria>> => {
+export const createMateriaController = async (materiaData: Partial<IMateria>): Promise<ControllerResponse<IMateria>> => {
   try {
-    const { user, ...materiaData } = req.body;
     const materiaCreada = await crearMateria(materiaData);
     return {
       success: true,
-      data: materiaCreada,
-      statusCode: 201
+      data: materiaCreada
     };
   } catch (error) {
     return {
       success: false,
-      error: error instanceof Error ? error.message : 'Error desconocido',
-      statusCode: 500
+      error: error instanceof Error ? error.message : 'Error desconocido'
     };
   }
 };
 
-export const getMateriaController = async (req: RequestWithUser): Promise<ControllerResponse<IMateria>> => {
+export const getMateriaController = async (id: string): Promise<ControllerResponse<IMateria>> => {
   try {
-    const materia = await obtenerMateria(req.params.id);
+    const materia = await obtenerMateria(id);
     if (!materia) {
       return {
         success: false,
-        error: 'Materia no encontrada',
-        statusCode: 404
+        error: 'Materia no encontrada'
       };
     }
     return {
       success: true,
-      data: materia,
-      statusCode: 200
+      data: materia
     };
   } catch (error) {
     return {
       success: false,
-      error: error instanceof Error ? error.message : 'Error desconocido',
-      statusCode: 500
+      error: error instanceof Error ? error.message : 'Error desconocido'
     };
   }
 };
@@ -56,39 +49,36 @@ export const getAllMateriasController = async (): Promise<ControllerResponse<IMa
     const materias = await obtenerMaterias();
     return {
       success: true,
-      data: materias,
-      statusCode: 200
+      data: materias
     };
   } catch (error) {
     return {
       success: false,
-      error: error instanceof Error ? error.message : 'Error desconocido',
-      statusCode: 500
+      error: error instanceof Error ? error.message : 'Error desconocido'
     };
   }
 };
 
-export const updateMateriaController = async (req: RequestWithUser): Promise<ControllerResponse<IMateria>> => {
+export const updateMateriaController = async (
+  id: string, 
+  updateData: Partial<IMateria>
+): Promise<ControllerResponse<IMateria>> => {
   try {
-    const { user, ...updateData } = req.body;
-    const materiaActualizada = await modificarMateria(req.params.id, updateData);
+    const materiaActualizada = await modificarMateria(id, updateData);
     if (!materiaActualizada) {
       return {
         success: false,
-        error: 'Materia no encontrada',
-        statusCode: 404
+        error: 'Materia no encontrada'
       };
     }
     return {
       success: true,
-      data: materiaActualizada,
-      statusCode: 200
+      data: materiaActualizada
     };
   } catch (error) {
     return {
       success: false,
-      error: error instanceof Error ? error.message : 'Error desconocido',
-      statusCode: 500
+      error: error instanceof Error ? error.message : 'Error desconocido'
     };
   }
 };
@@ -96,31 +86,27 @@ export const updateMateriaController = async (req: RequestWithUser): Promise<Con
 export const healthCheck = async (): Promise<ControllerResponse<{ status: string }>> => {
   return {
     success: true,
-    data: { status: 'ok' },
-    statusCode: 200
+    data: { status: 'ok' }
   };
 };
 
-export const deleteMateriaController = async (req: RequestWithUser): Promise<ControllerResponse<IMateria>> => {
+export const deleteMateriaController = async (id: string): Promise<ControllerResponse<IMateria>> => {
   try {
-    const materiaEliminada = await eliminarMateria(req.params.id);
+    const materiaEliminada = await eliminarMateria(id);
     if (!materiaEliminada) {
       return {
         success: false,
-        error: 'Materia no encontrada o ya está eliminada',
-        statusCode: 404
+        error: 'Materia no encontrada o ya está eliminada'
       };
     }
     return {
       success: true,
-      data: materiaEliminada,
-      statusCode: 200
+      data: materiaEliminada
     };
   } catch (error) {
     return {
       success: false,
-      error: error instanceof Error ? error.message : 'Error desconocido',
-      statusCode: 500
+      error: error instanceof Error ? error.message : 'Error desconocido'
     };
   }
 };
