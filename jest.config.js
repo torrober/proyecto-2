@@ -8,8 +8,6 @@ module.exports = {
     '^@/(.*)$': '<rootDir>/src/$1',
   },
   verbose: true,
-  maxWorkers: 1, // Esto fuerza que los tests se ejecuten en serie
-  maxConcurrency: 1, // Asegura que solo un test se ejecute a la vez
   collectCoverage: true,
   coverageDirectory: 'coverage',
   coverageReporters: ['text', 'lcov'],
