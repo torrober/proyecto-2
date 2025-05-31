@@ -165,6 +165,7 @@ curl -X DELETE http://localhost:3000/api/materias/id_materia \
 npm run dev    # Inicia el servidor en modo desarrollo
 npm run build  # Compila el proyecto
 npm start      # Inicia el servidor en modo producción
+npm test       # Pruebas
 ```
 
 ## Control de Acceso
